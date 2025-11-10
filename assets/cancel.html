@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cancel Booking</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 24px; background:#f6f7f9; }
+    .card { max-width: 640px; margin: 0 auto; background:#fff; border:1px solid #e2e8f0; border-radius: 8px; padding: 20px; }
+    h2 { margin-top: 0; color:#dc3232; }
+    .ok { color: #22863a; }
+    .warn { color: #b00020; }
+    .muted { color:#666; }
+    .actions { margin-top: 16px; }
+    .btn { display:inline-block; padding:10px 14px; border-radius:6px; border:1px solid #0073aa; color:#fff; background:#0073aa; text-decoration:none; }
+    .btn.alt { background:#fff; color:#0073aa; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 id="t-cancel-title">Cancel your booking</h2>
+    <div id="status" class="muted">Processing your request…</div>
+    <div class="actions" id="actions" style="display:none;">
+      <a id="homeLink" href="/" class="btn" style="display:none;">Return to website</a>
+    </div>
+  </div>
+  <script>
+    // Basic i18n for static page (English, Norwegian Bokmål)
+    (function(){
+      const dict = {
+        en: {
+          cancel_title: 'Cancel your booking',
+          processing: 'Processing your request…',
+          return_home: 'Return to website',
+          missing_params: 'Missing booking parameters.',
+          cancelled: 'Your booking has been cancelled.',
+          request_completed: 'Request completed.',
+          unable_to_cancel: 'Unable to cancel:',
+          error_prefix: 'Error:'
+        },
+        nb: {
+          cancel_title: 'Avbestill bestillingen din',
+          processing: 'Behandler forespørselen din…',
+          return_home: 'Tilbake til nettstedet',
+          missing_params: 'Mangler bestillingsparametere.',
+          cancelled: 'Bestillingen din er avbestilt.',
+          request_completed: 'Forespørselen er fullført.',
+          unable_to_cancel: 'Kan ikke avbestille:',
+          error_prefix: 'Feil:'
+        }
+      };
+      function detectLang(){
+        const p = new URLSearchParams(location.search).get('lang') || '';
+        const nav = (navigator.language || 'en').toLowerCase();
+        const code = (p || nav);
+        if (code.startsWith('nb') || code.startsWith('no')) return 'nb';
+        return 'en';
+      }
+      const L = detectLang();
+      document.documentElement.lang = (L === 'nb' ? 'nb' : 'en');
+      const t = (k) => (dict[L] && dict[L][k]) || (dict.en && dict.en[k]) || k;
+      // Apply initial texts
+      const h2 = document.getElementById('t-cancel-title'); if (h2) h2.textContent = t('cancel_title');
+      const st = document.getElementById('status'); if (st) st.textContent = t('processing');
+      const hl = document.getElementById('homeLink'); if (hl) hl.textContent = t('return_home');
+      // Expose translator for later usage below
+      window.__td_i18n = { t };
+    })();
+
+  (async function(){
+      // Debug helpers: enable with ?debug=1 or localStorage.setItem('td_bkg_debug','1')
+      const __qs = new URLSearchParams(location.search);
+      const __debug = __qs.has('debug') || localStorage.getItem('td_bkg_debug') === '1';
+      const __mask = (v) => v ? (v.length > 8 ? (v.slice(0,4) + '…' + v.slice(-4)) : '****') : '';
+      const __dbg = (...args) => { if (__debug) console.debug('[Cancel]', ...args); };
+      const __err = (...args) => console.error('[Cancel]', ...args);
+
+      const __isRestRouteBase = (b) => (b||'').includes('rest_route=');
+  const __isJson = (res) => (res.headers.get('content-type') || '').toLowerCase().includes('application/json');
+      async function __safeJson(res, fallback) {
+        try {
+          if (__isJson(res)) return await res.json();
+          const txt = await res.text();
+          try { return JSON.parse(txt); } catch(_) { return fallback !== undefined ? fallback : { message: txt || 'Unexpected response' }; }
+        } catch(e) {
+          __err('JSON parse failed', e);
+          return fallback !== undefined ? fallback : { message: 'Unexpected response' };
+        }
+      }
+      function __routeUrl(base, path, paramsObj) {
+        const qs = new URLSearchParams(paramsObj || {});
+        const p = path.startsWith('/') ? path : '/' + path;
+        if (__isRestRouteBase(base)) {
+          const baseUrl = base.endsWith('rest_route=') ? base : (base + (base.includes('?') ? '&' : '?') + 'rest_route=');
+          return baseUrl + encodeURI(p) + (qs.toString() ? '&' + qs.toString() : '');
+        }
+        const b = (base||'').endsWith('/') ? base.slice(0,-1) : (base||'');
+        return b + p + (qs.toString() ? '?' + qs.toString() : '');
+      }
+      const qs = new URLSearchParams(location.search);
+      const id = qs.get('id');
+      const token = qs.get('token');
+      let base = qs.get('rest') || '/wp-json';
+      const out = document.getElementById('status');
+      __dbg('init', { id, token: __mask(token), base });
+      if (!id || !token) { out.textContent = (window.__td_i18n||{}).t('missing_params'); out.className='warn'; return; }
+      try {
+        const t = (window.__td_i18n||{}).t;
+        let url = __routeUrl(base, `/td/v1/booking/${id}/cancel`, { token });
+        __dbg('GET cancel', url);
+        let res = await fetch(url, { headers: { 'Accept': 'application/json' }});
+        let parsed = null;
+        let success = false;
+        if (res.ok && __isJson(res)) {
+          parsed = await __safeJson(res, null);
+          success = !!(parsed && parsed.status === 'cancelled');
+        }
+        // If not successful (non-JSON 200 or other), try rest_route fallback when base isn't rest_route
+        if (!success && !__isRestRouteBase(base)) {
+          const alt = '/?rest_route=';
+          const altUrl = __routeUrl(alt, `/td/v1/booking/${id}/cancel`, { token });
+          __dbg('Retry GET cancel via rest_route', altUrl);
+          const altRes = await fetch(altUrl, { headers: { 'Accept': 'application/json' }});
+          if (altRes.ok && __isJson(altRes)) {
+            const altParsed = await __safeJson(altRes, null);
+            if (altParsed && altParsed.status === 'cancelled') {
+              success = true;
+              parsed = altParsed; base = alt; res = altRes;
+            }
+          }
+        }
+        if (success) {
+          out.textContent = t('cancelled');
+          out.className = 'ok';
+        } else {
+          const body = parsed || (await __safeJson(res, { message: 'Unexpected response' }));
+          __err('Cancel failed or unexpected response', { status: res.status, body });
+          out.textContent = `${t('unable_to_cancel')} ${body.message || res.status || ''}`.trim();
+          out.className = 'warn';
+        }
+      } catch(e) {
+        __err('Unhandled error', e);
+        const t = (window.__td_i18n||{}).t;
+        out.textContent = `${t('error_prefix')} ${e.message}`;
+        out.className = 'warn';
+      } finally {
+        const fromEmail = (qs.get('src') === 'email');
+        const hasReferrer = !!(document.referrer && document.referrer.indexOf(location.origin) === 0);
+        if (!fromEmail && hasReferrer) {
+          document.getElementById('homeLink').style.display = 'inline-block';
+        }
+        document.getElementById('actions').style.display='block';
+      }
+    })();
+  </script>
+</body>
+</html>

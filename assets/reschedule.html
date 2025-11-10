@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reschedule Booking</title>
+  <script>
+  // Basic i18n for static page (English, Norwegian Bokmål)
+  (function(){
+    const dict = {
+      en: {
+        page_title: 'Reschedule Booking',
+        heading: 'Reschedule your booking',
+        service: 'Service',
+        current_time: 'Current time',
+        choose_new: 'Choose a new time',
+        selected: 'Selected',
+        cancel: 'Cancel',
+        confirm_change: 'Confirm change',
+        loading: 'Loading…',
+        missing_params: 'Missing booking parameters.',
+        unable_load_booking: 'Unable to load booking',
+        unable_load_details: 'Unable to load booking details. Please try again from your email link.',
+        availability_error: 'Availability error',
+        please_choose_time: 'Please choose a new time',
+        rescheduled_ok: 'Rescheduled successfully. A confirmation email was sent.',
+        error_prefix: 'Error:',
+        appointment: 'Appointment'
+      },
+      nb: {
+        page_title: 'Endre tidspunkt',
+        heading: 'Endre bestillingen din',
+        service: 'Tjeneste',
+        current_time: 'Nåværende tidspunkt',
+        choose_new: 'Velg et nytt tidspunkt',
+        selected: 'Valgt',
+        cancel: 'Avbryt',
+        confirm_change: 'Bekreft endring',
+        loading: 'Laster…',
+        missing_params: 'Mangler bestillingsparametere.',
+        unable_load_booking: 'Kan ikke laste bestilling',
+        unable_load_details: 'Kan ikke laste bestillingsdetaljer. Prøv igjen fra e‑postlenken.',
+        availability_error: 'Tilgjengelighetsfeil',
+        please_choose_time: 'Velg et nytt tidspunkt',
+        rescheduled_ok: 'Endring vellykket. En bekreftelses‑e‑post er sendt.',
+        error_prefix: 'Feil:',
+        appointment: 'Timebestilling'
+      }
+    };
+    function detectLang(){
+      const p = new URLSearchParams(location.search).get('lang') || '';
+      const nav = (navigator.language || 'en').toLowerCase();
+      const code = (p || nav);
+      if (code.startsWith('nb') || code.startsWith('no')) return 'nb';
+      return 'en';
+    }
+    const L = detectLang();
+    document.documentElement.lang = (L === 'nb' ? 'nb' : 'en');
+    const t = (k) => (dict[L] && dict[L][k]) || (dict.en && dict.en[k]) || k;
+    document.title = t('page_title');
+    window.__td_i18n = { t };
+  })();
+  </script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .container { max-width: 640px; margin: 0 auto; }
+    .card { background:#fff; border:1px solid #ddd; border-radius:8px; padding:20px; }
+    .row { display:flex; gap:12px; flex-wrap: wrap; }
+    .row > * { flex: 1; min-width: 220px; }
+    .slots { display:grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap:10px; margin-top:10px; }
+    .slot { padding:8px 10px; border:1px solid #0073aa; color:#0073aa; border-radius:6px; text-align:center; cursor:pointer; background:#f5fbff; }
+    .slot.selected { background:#0073aa; color:#fff; }
+    .actions { margin-top:16px; display:flex; gap:10px; justify-content:flex-end; }
+    .btn { padding:10px 14px; border-radius:6px; border:1px solid #0073aa; color:#fff; background:#0073aa; cursor:pointer; }
+    .btn.secondary { background:#fff; color:#0073aa; }
+    .muted { color:#666; }
+    .error { color:#b00020; margin-top:8px; }
+    .disabled { opacity: 0.5; pointer-events: none; }
+  </style>
+  <script>
+  // Debug helpers: enable with ?debug=1 or localStorage.setItem('td_bkg_debug','1')
+  const __qs = new URLSearchParams(location.search);
+  const __debug = __qs.has('debug') || localStorage.getItem('td_bkg_debug') === '1';
+  const __mask = (v) => v ? (v.length > 8 ? (v.slice(0,4) + '…' + v.slice(-4)) : '****') : '';
+  const __dbg = (...args) => { if (__debug) console.debug('[Reschedule]', ...args); };
+  const __err = (...args) => console.error('[Reschedule]', ...args);
+  const __isRestRouteBase = (b) => b.includes('rest_route=');
+  const __isJson = (res) => (res.headers.get('content-type') || '').toLowerCase().includes('application/json');
+  async function __safeJson(res, fallback) {
+    try {
+      if (__isJson(res)) return await res.json();
+      const txt = await res.text();
+      try {
+        // Try parsing text as JSON even if header is wrong
+        return JSON.parse(txt);
+      } catch(_) {
+        if (__debug) __err('Non-JSON response body (truncated):', (txt || '').slice(0, 200));
+        const fb = (fallback !== undefined ? fallback : { message: txt || 'Unexpected response' });
+        if (fb && typeof fb === 'object') fb.__raw = txt;
+        return fb;
+      }
+    } catch(e) {
+      __err('JSON parse failed', e);
+      return fallback !== undefined ? fallback : { message: 'Unexpected response' };
+    }
+  }
+  function __routeUrl(base, path, paramsObj) {
+    const qs = new URLSearchParams(paramsObj || {});
+    if (__isRestRouteBase(base)) {
+      const p = path.startsWith('/') ? path : '/' + path;
+      const baseUrl = base.endsWith('rest_route=') ? base : (base + (base.includes('?') ? '&' : '?') + 'rest_route=');
+      return baseUrl + encodeURI(p) + (qs.toString() ? '&' + qs.toString() : '');
+    }
+    const p = path.startsWith('/') ? path : '/' + path;
+    const b = base.endsWith('/') ? base.slice(0, -1) : base;
+    return b + p + (qs.toString() ? '?' + qs.toString() : '');
+  }
+
+  async function init() {
+    const qs = new URLSearchParams(location.search);
+    const id = qs.get('id');
+    const token = qs.get('token');
+  let base = qs.get('rest') || (document.currentScript && document.currentScript.dataset.base) || '/wp-json';
+    __dbg('init', { id, token: __mask(token), base });
+      if (!id || !token) { 
+      document.getElementById('app').innerHTML = '<p class="error">' + (window.__td_i18n||{}).t('missing_params') + '</p>';
+      return;
+    }
+    try {
+      let infoUrl = __routeUrl(base, `/td/v1/booking/${id}`, { token });
+      __dbg('GET booking', infoUrl);
+  let infoRes = await fetch(infoUrl, { headers: { 'Accept': 'application/json' }});
+        if (!infoRes.ok) {
+          const err = await __safeJson(infoRes, {message:(window.__td_i18n||{}).t('unable_load_booking')});
+        __err('GET booking failed', { status: infoRes.status, body: err });
+        // Fallback to rest_route style if not already using it
+        if (!__isRestRouteBase(base)) {
+          const alt = '/?rest_route=';
+          const altUrl = __routeUrl(alt, `/td/v1/booking/${id}`, { token });
+          __dbg('Retry GET booking via rest_route', altUrl);
+          const altRes = await fetch(altUrl, { headers: { 'Accept': 'application/json' }});
+          if (altRes.ok) { infoRes = altRes; base = alt; }
+          else {
+            const altErr = await __safeJson(altRes, {message:(window.__td_i18n||{}).t('unable_load_booking')});
+            __err('GET booking retry failed', { status: altRes.status, body: altErr });
+            throw new Error(err.message || `Unable to load booking (HTTP ${infoRes.status})`);
+          }
+        } else {
+          throw new Error(err.message || `Unable to load booking (HTTP ${infoRes.status})`);
+        }
+        }
+      let info = await __safeJson(infoRes, {});
+      __dbg('GET booking ok', info);
+      if (!info || (!info.start_local && !info.end_local && !info.service)) {
+        // Attempt alternate base even after 200 OK if payload is invalid/missing
+        const triedAlt = __isRestRouteBase(base);
+        if (!triedAlt) {
+          const alt = '/?rest_route=';
+          const altUrl2 = __routeUrl(alt, `/td/v1/booking/${id}`, { token });
+          __dbg('Retry GET booking (payload invalid) via rest_route', altUrl2);
+          const altRes2 = await fetch(altUrl2, { headers: { 'Accept':'application/json' }});
+          if (altRes2.ok) {
+            const parsed = await __safeJson(altRes2, {});
+            if (parsed && (parsed.start_local || parsed.end_local || parsed.service)) {
+              base = alt; info = parsed;
+            }
+          }
+        }
+      }
+      if (!info || (!info.start_local && !info.end_local && !info.service)) {
+        if (__debug) __err('Booking details missing/invalid', info);
+        const extra = (__debug && info && info.__raw) ? `<pre style=\"white-space:pre-wrap;max-height:180px;overflow:auto;background:#f9f9f9;border:1px solid #eee;padding:8px;\">${(info.__raw||'').replace(/</g,'&lt;').slice(0,1000)}</pre>` : '';
+        document.getElementById('app').innerHTML = `<p class=\"error\">${(window.__td_i18n||{}).t('unable_load_details')}</p>${extra}`;
+        return;
+      }
+      document.getElementById('svc').textContent = info.service || (window.__td_i18n||{}).t('appointment');
+      document.getElementById('current').textContent = `${info.start_local || ''} → ${info.end_local || ''}`;
+      // Load availability for next 14 days
+      const from = new Date().toISOString().slice(0,19);
+      const to = new Date(Date.now()+14*86400000).toISOString().slice(0,19);
+      let availUrl = __routeUrl(base, '/td/v1/availability', { service_id: (info.service_id||''), from, to, duration: info.duration_min });
+      __dbg('GET availability', availUrl);
+  let availRes = await fetch(availUrl, { headers: { 'Accept': 'application/json' }});
+      let slots = [];
+        if (availRes.ok) { slots = await __safeJson(availRes, []); } else {
+          const j = await __safeJson(availRes, {message:(window.__td_i18n||{}).t('availability_error')});
+        __err('GET availability failed', { status: availRes.status, body: j });
+          if (!__isRestRouteBase(base)) {
+            const alt = '/?rest_route=';
+            const altUrl = __routeUrl(alt, '/td/v1/availability', { service_id: (info.service_id||''), from, to, duration: info.duration_min });
+            __dbg('Retry GET availability via rest_route', altUrl);
+            const altRes = await fetch(altUrl, { headers: { 'Accept': 'application/json' }});
+            if (altRes.ok) { availRes = altRes; base = alt; slots = await __safeJson(altRes, []); }
+            else {
+              const altJ = await __safeJson(altRes, {message:(window.__td_i18n||{}).t('availability_error')});
+              __err('GET availability retry failed', { status: altRes.status, body: altJ });
+              throw new Error(j.message || `Availability error (HTTP ${availRes.status})`);
+            }
+          } else {
+            throw new Error(j.message || `Availability error (HTTP ${availRes.status})`);
+          }
+        }
+      __dbg('GET availability ok', { count: Array.isArray(slots) ? slots.length : 0 });
+      const grid = document.getElementById('slots');
+      grid.innerHTML = '';
+      slots.forEach(s => {
+        const el = document.createElement('button');
+        el.type = 'button'; el.className = 'slot';
+        const dt = new Date(s.start_utc);
+        el.textContent = dt.toLocaleString();
+        el.dataset.utc = s.start_utc.replace('Z','').replace('T',' ');
+        el.onclick = () => {
+          document.querySelectorAll('.slot').forEach(n => n.classList.remove('selected'));
+          el.classList.add('selected');
+          document.getElementById('selected').textContent = el.textContent;
+          document.getElementById('selected').dataset.utc = el.dataset.utc;
+        };
+        grid.appendChild(el);
+      });
+      document.getElementById('submit').onclick = async () => {
+        const sel = document.getElementById('selected').dataset.utc;
+  if (!sel) { alert((window.__td_i18n||{}).t('please_choose_time')); return; }
+        const postUrl = __routeUrl(base, `/td/v1/booking/${id}/reschedule`);
+        __dbg('POST reschedule', { url: postUrl, start_utc: sel });
+        const res = await fetch(postUrl, {
+          method:'POST', headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+          body: JSON.stringify({ token, start_utc: sel })
+        });
+        if (res.ok) {
+          // Grey out/selectors disabled
+          document.querySelectorAll('.slot').forEach(n => n.classList.add('disabled'));
+          document.getElementById('submit').classList.add('disabled');
+          document.getElementById('status').textContent = (window.__td_i18n||{}).t('rescheduled_ok');
+          // Redirect to success page unless explicitly disabled
+          const noRedirect = (new URLSearchParams(location.search)).has('noRedirect');
+          if (!noRedirect) {
+            const successPath = location.pathname.replace('reschedule.html', 'reschedule-success.html');
+            const next = successPath + `?id=${encodeURIComponent(id)}&token=${encodeURIComponent(token)}` + (base ? `&rest=${encodeURIComponent(base)}` : '') + (__debug ? '&debug=1' : '');
+            __dbg('Redirecting to success page', next);
+            location.assign(next);
+          }
+        } else {
+          const j = await __safeJson(res, {message:'Failed'});
+          __err('POST reschedule failed', { status: res.status, body: j });
+          document.getElementById('status').textContent = `${(window.__td_i18n||{}).t('error_prefix')} ${j.message || res.status}`;
+        }
+      };
+    } catch (e) {
+      __err('Unhandled error', e);
+      document.getElementById('app').innerHTML = `<p class="error">${e.message}</p>`;
+    }
+  }
+  window.addEventListener('DOMContentLoaded', init);
+  </script>
+  <script data-base="/wp-json"></script>
+  </head>
+<body>
+  <div class="container">
+    <h2 id="t-resched-heading">Reschedule your booking</h2>
+    <div class="card" id="app">
+      <p><strong id="t-service">Service</strong>: <span id="svc" class="muted">Loading…</span></p>
+      <p><strong id="t-current">Current time</strong>: <span id="current" class="muted">Loading…</span></p>
+      <p><strong id="t-choose">Choose a new time</strong></p>
+      <div id="slots" class="slots"></div>
+      <p class="muted"><span id="t-selected">Selected</span>: <span id="selected"></span></p>
+      <div class="actions">
+        <a class="btn secondary" href="#" id="t-cancel">Cancel</a>
+        <button class="btn" id="submit"><span id="t-confirm">Confirm change</span></button>
+      </div>
+      <p id="status" class="muted"></p>
+    </div>
+  </div>
+  <script>
+    // Apply static translations after DOM
+    (function(){
+      const t = (window.__td_i18n||{}).t || function(x){return x};
+      const map = {
+        't-resched-heading':'heading',
+        't-service':'service',
+        't-current':'current_time',
+        't-choose':'choose_new',
+        't-selected':'selected',
+        't-cancel':'cancel',
+        't-confirm':'confirm_change'
+      };
+      Object.keys(map).forEach(id => { var el = document.getElementById(id); if (el) el.textContent = t(map[id]); });
+      // Loading placeholders
+      document.querySelectorAll('.muted').forEach(el => {
+        if (el.textContent && el.textContent.trim() === 'Loading…') el.textContent = t('loading');
+      });
+      // Wire Cancel link to cancel.html with id/token/rest
+      try {
+        const qs = new URLSearchParams(location.search);
+        const id = qs.get('id');
+        const token = qs.get('token');
+        const base = qs.get('rest') || '/wp-json';
+        const selfPath = location.pathname;
+        const cancelPath = selfPath.replace('reschedule.html','cancel.html');
+        const tail = `?id=${encodeURIComponent(id||'')}&token=${encodeURIComponent(token||'')}` + (base ? `&rest=${encodeURIComponent(base)}` : '') + (qs.has('debug') ? '&debug=1' : '');
+        const cancelA = document.getElementById('t-cancel');
+        if (cancelA) { cancelA.href = cancelPath + tail; }
+      } catch(_) {}
+    })();
+  </script>
+</body>
+</html>

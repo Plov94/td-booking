@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Rescheduled</title>
+  <script>
+    // Basic i18n for static page (English, Norwegian Bokmål)
+    (function(){
+      const dict = {
+        en: {
+          page_title: 'Booking Rescheduled',
+          heading: 'All set! Your booking was rescheduled.',
+          emailed: 'We\u2019ve emailed you a confirmation with the updated appointment details.',
+          return_home: 'Return to website',
+          reschedule_again: 'Reschedule again',
+          cancel_booking: 'Cancel booking',
+          service: 'Service',
+          new_time: 'New time',
+          all_saved: 'All changes saved.',
+          unable_load_booking: 'Unable to load booking',
+          unable_load_details: 'Unable to load booking details.'
+        },
+        nb: {
+          page_title: 'Tidspunkt endret',
+          heading: 'Klart! Bestillingen din ble endret.',
+          emailed: 'Vi har sendt deg en bekreftelse med oppdaterte detaljer.',
+          return_home: 'Tilbake til nettstedet',
+          reschedule_again: 'Endre igjen',
+          cancel_booking: 'Avbestill',
+          service: 'Tjeneste',
+          new_time: 'Nytt tidspunkt',
+          all_saved: 'Alle endringer er lagret.',
+          unable_load_booking: 'Kan ikke laste bestilling',
+          unable_load_details: 'Kan ikke laste bestillingsdetaljer.'
+        }
+      };
+      function detectLang(){
+        const p = new URLSearchParams(location.search).get('lang') || '';
+        const nav = (navigator.language || 'en').toLowerCase();
+        const code = (p || nav);
+        if (code.startsWith('nb') || code.startsWith('no')) return 'nb';
+        return 'en';
+      }
+      const L = detectLang();
+      document.documentElement.lang = (L === 'nb' ? 'nb' : 'en');
+      const t = (k) => (dict[L] && dict[L][k]) || (dict.en && dict.en[k]) || k;
+      document.title = t('page_title');
+      window.__td_i18n = { t };
+    })();
+  </script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 24px; background:#f6f7f9; }
+    .card { max-width: 720px; margin: 0 auto; background:#fff; border:1px solid #e2e8f0; border-radius: 10px; padding: 24px; }
+    h2 { margin: 0 0 8px; color:#116329; }
+    .muted { color:#586069; }
+    .row { display:flex; flex-wrap: wrap; gap:12px; }
+    .row > div { flex:1; min-width: 220px; }
+    .actions { margin-top: 18px; display:flex; gap:10px; }
+    .btn { display:inline-block; padding:10px 14px; border-radius:6px; border:1px solid #0073aa; color:#fff; background:#0073aa; text-decoration:none; }
+    .btn.alt { background:#fff; color:#0073aa; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 id="t-success-heading">All set! Your booking was rescheduled.</h2>
+    <p class="muted" id="t-emailed">We’ve emailed you a confirmation with the updated appointment details.</p>
+    <div id="details" class="row" style="margin-top:12px;"></div>
+    <p id="status" class="muted"></p>
+    <div class="actions">
+  <a id="homeLink" href="/" class="btn" style="display:none;">Return to website</a>
+  <a id="reschedLink" href="#" class="btn alt">Reschedule again</a>
+  <a id="cancelLink" href="#" class="btn alt">Cancel booking</a>
+    </div>
+  </div>
+  <script>
+    // Debug helpers
+    const __qs = new URLSearchParams(location.search);
+    const __debug = __qs.has('debug') || localStorage.getItem('td_bkg_debug') === '1';
+    const __mask = (v) => v ? (v.length > 8 ? (v.slice(0,4) + '…' + v.slice(-4)) : '****') : '';
+    const __dbg = (...args) => { if (__debug) console.debug('[Resched Success]', ...args); };
+    const __err = (...args) => console.error('[Resched Success]', ...args);
+    const __isRestRouteBase = (b) => b.includes('rest_route=');
+    function __routeUrl(base, path, paramsObj) {
+      const qs = new URLSearchParams(paramsObj || {});
+      if (__isRestRouteBase(base)) {
+        const p = path.startsWith('/') ? path : '/' + path;
+        const baseUrl = base.endsWith('rest_route=') ? base : (base + (base.includes('?') ? '&' : '?') + 'rest_route=');
+        return baseUrl + encodeURI(p) + (qs.toString() ? '&' + qs.toString() : '');
+      }
+      const p = path.startsWith('/') ? path : '/' + path;
+      const b = base.endsWith('/') ? base.slice(0, -1) : base;
+      return b + p + (qs.toString() ? '?' + qs.toString() : '');
+    }
+
+    const __isJson = (res) => (res.headers.get('content-type') || '').toLowerCase().includes('application/json');
+    async function __safeJson(res, fallback) {
+      try {
+        if (__isJson(res)) return await res.json();
+        const txt = await res.text();
+        try { return JSON.parse(txt); } catch(_) { return fallback !== undefined ? fallback : { message: txt }; }
+      } catch(e) {
+        __err('JSON parse failed', e);
+        return fallback !== undefined ? fallback : { message: 'Unexpected response' };
+      }
+    }
+
+    async function init() {
+      const qs = new URLSearchParams(location.search);
+      const id = qs.get('id');
+      const token = qs.get('token');
+      let base = qs.get('rest') || '/wp-json';
+      __dbg('init', { id, token: __mask(token), base });
+      const t = (window.__td_i18n||{}).t || function(x){return x};
+      // Set static texts
+      const h = document.getElementById('t-success-heading'); if (h) h.textContent = t('heading');
+      const p = document.getElementById('t-emailed'); if (p) p.textContent = t('emailed');
+      // Wire action links
+      const selfPath = location.pathname;
+      const reschedPath = selfPath.replace('reschedule-success.html','reschedule.html');
+      const cancelPath = selfPath.replace('reschedule-success.html','cancel.html');
+      const tail = `?id=${encodeURIComponent(id||'')}&token=${encodeURIComponent(token||'')}` + (base ? `&rest=${encodeURIComponent(base)}` : '') + (__debug ? '&debug=1' : '');
+      document.getElementById('reschedLink').href = reschedPath + tail;
+      document.getElementById('cancelLink').href = cancelPath + tail;
+
+      // Show 'Return to website' only if we likely came from the website
+      // Signal from emails: src=email param; if present, do not show home link
+      const fromEmail = (qs.get('src') === 'email');
+      const hasReferrer = !!(document.referrer && document.referrer.indexOf(location.origin) === 0);
+      if (!fromEmail && hasReferrer) {
+        const hl = document.getElementById('homeLink');
+        hl.style.display = 'inline-block';
+        hl.textContent = t('return_home');
+      }
+      // Set action link labels
+      document.getElementById('reschedLink').textContent = t('reschedule_again');
+      document.getElementById('cancelLink').textContent = t('cancel_booking');
+
+      if (!id || !token) {
+        document.getElementById('status').textContent = t('unable_load_details');
+        return;
+      }
+      try {
+        let url = __routeUrl(base, `/td/v1/booking/${id}`, { token });
+        __dbg('GET booking', url);
+        let r = await fetch(url, { headers: { 'Accept':'application/json' }});
+        if (!r.ok && !__isRestRouteBase(base)) {
+          const altBase = '/?rest_route=';
+          const altUrl = __routeUrl(altBase, `/td/v1/booking/${id}`, { token });
+          __dbg('Retry GET booking via rest_route', altUrl);
+          const rr = await fetch(altUrl, { headers: { 'Accept':'application/json' }});
+          if (rr.ok) { r = rr; base = altBase; }
+        }
+        if (!r.ok) {
+          const j = await __safeJson(r, {message:t('unable_load_booking')});
+          __err('GET booking failed', { status: r.status, body: j });
+          document.getElementById('status').textContent = j.message || `${t('unable_load_booking')} (HTTP ${r.status})`;
+          return;
+        }
+        const info = await __safeJson(r, {});
+        __dbg('GET booking ok', info);
+        if (!info || (!info.start_local && !info.end_local && !info.service)) {
+          document.getElementById('status').textContent = t('unable_load_details');
+          return;
+        }
+  const details = document.getElementById('details');
+  details.innerHTML = '';
+  const a = document.createElement('div'); a.innerHTML = `<strong>${t('service')}</strong><br><span class="muted">${info.service || 'Appointment'}</span>`; details.appendChild(a);
+  const nt = document.createElement('div'); nt.innerHTML = `<strong>${t('new_time')}</strong><br><span class="muted">${(info.start_local||'')} \u2192 ${(info.end_local||'')}</span>`; details.appendChild(nt);
+        document.getElementById('status').textContent = t('all_saved');
+      } catch(e) {
+        __err('Unhandled error', e);
+        document.getElementById('status').textContent = e.message || 'Unexpected error.';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

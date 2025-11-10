@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TD Booking API Integration Examples</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; max-width: 800px; }
+        .endpoint { background: #f1f1f1; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .method { color: #d73527; font-weight: bold; }
+        .url { color: #0066cc; font-family: monospace; }
+        code { background: #e8e8e8; padding: 2px 5px; border-radius: 3px; }
+        pre { background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🚀 TD Booking API Integration Guide</h1>
+
+    <h2>Available API Endpoints</h2>
+
+    <div class="endpoint">
+        <h3><span class="method">GET</span> Get Available Time Slots</h3>
+        <div class="url">GET /wp-json/td/v1/availability</div>
+        <p><strong>Parameters:</strong></p>
+        <ul>
+            <li><code>service_id</code> - Service ID (required)</li>
+            <li><code>from</code> - Start date (YYYY-MM-DD HH:MM:SS format)</li>
+            <li><code>to</code> - End date (YYYY-MM-DD HH:MM:SS format)</li>
+            <li><code>duration</code> - Duration in minutes (optional, uses service default)</li>
+        </ul>
+        <p><strong>Example Response:</strong></p>
+        <pre>[
+  {
+    "start_utc": "2025-09-09T09:00:00Z",
+    "end_utc": "2025-09-09T10:00:00Z",
+    "staff_id": 1
+  },
+  {
+    "start_utc": "2025-09-09T10:00:00Z", 
+    "end_utc": "2025-09-09T11:00:00Z",
+    "staff_id": 1
+  }
+]</pre>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method">POST</span> Create Booking</h3>
+        <div class="url">POST /wp-json/td/v1/book</div>
+        <p><strong>Headers:</strong></p>
+        <ul>
+            <li><code>Content-Type: application/json</code></li>
+            <li><code>X-WP-Nonce: [WordPress nonce]</code> (for WordPress auth)</li>
+        </ul>
+        <p><strong>Body:</strong></p>
+        <pre>{
+  "service_id": 1,
+  "start_utc": "2025-09-09 09:00:00",
+  "customer": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+1234567890",
+    "address": "123 Main St"
+  },
+  "notes": "Laptop not turning on",
+  "wc": false,
+  "terms_accepted": true
+}</pre>
+        <p><strong>Success Response:</strong></p>
+        <pre>{
+  "booking_id": 123,
+  "status": "confirmed",
+  "start_utc": "2025-09-09 09:00:00",
+  "end_utc": "2025-09-09 10:00:00"
+}</pre>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method">GET</span> Get Services List</h3>
+        <div class="url">GET /wp-json/td/v1/services</div>
+        <p>Returns all active services available for booking.</p>
+    </div>
+
+    <h2>JavaScript Example (Vanilla JS)</h2>
+    <pre>// Fetch available time slots
+async function getAvailableSlots(serviceId, date) {
+    const response = await fetch(`/wp-json/td/v1/availability?service_id=${serviceId}&from=${date} 08:00:00&to=${date} 18:00:00`);
+    return await response.json();
+}
+
+// Create a booking
+async function createBooking(bookingData) {
+    const response = await fetch('/wp-json/td/v1/book', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': wpApiSettings.nonce // WordPress nonce
+        },
+        body: JSON.stringify(bookingData)
+    });
+    return await response.json();
+}
+
+// Usage example
+const slots = await getAvailableSlots(1, '2025-09-09');
+const booking = await createBooking({
+    service_id: 1,
+    start_utc: '2025-09-09 09:00:00',
+    customer: {
+        name: 'Jane Smith',
+        email: 'jane@example.com'
+    },
+    terms_accepted: true
+});</pre>
+
+    <h2>React/Next.js Example</h2>
+    <pre>import { useState, useEffect } from 'react';
+
+function BookingForm() {
+    const [services, setServices] = useState([]);
+    const [slots, setSlots] = useState([]);
+    const [selectedService, setSelectedService] = useState('');
+
+    useEffect(() => {
+        // Fetch services on mount
+        fetch('/wp-json/td/v1/services')
+            .then(res => res.json())
+            .then(setServices);
+    }, []);
+
+    const fetchSlots = async (serviceId) => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dateStr = tomorrow.toISOString().split('T')[0];
+        
+        const response = await fetch(
+            `/wp-json/td/v1/availability?service_id=${serviceId}&from=${dateStr} 08:00:00&to=${dateStr} 18:00:00`
+        );
+        const slots = await response.json();
+        setSlots(slots);
+    };
+
+    const handleSubmit = async (formData) => {
+        const response = await fetch('/wp-json/td/v1/book', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        if (response.ok) {
+            alert('Booking confirmed!');
+        }
+    };
+
+    return (
+        &lt;form onSubmit={handleSubmit}&gt;
+            &lt;select onChange={e => fetchSlots(e.target.value)}&gt;
+                {services.map(s => &lt;option key={s.id} value={s.id}&gt;{s.name}&lt;/option&gt;)}
+            &lt;/select&gt;
+            
+            &lt;select name="slot"&gt;
+                {slots.map(slot => 
+                    &lt;option key={slot.start_utc} value={slot.start_utc}&gt;
+                        {slot.start_utc}
+                    &lt;/option&gt;
+                )}
+            &lt;/select&gt;
+            
+            &lt;input name="customer_name" placeholder="Name" required /&gt;
+            &lt;input name="customer_email" type="email" placeholder="Email" required /&gt;
+            
+            &lt;button type="submit"&gt;Book Appointment&lt;/button&gt;
+        &lt;/form&gt;
+    );
+}</pre>
+
+    <h2>PHP/Laravel Example</h2>
+    <pre>// Get available slots
+$response = Http::get('https://yoursite.com/wp-json/td/v1/availability', [
+    'service_id' => 1,
+    'from' => '2025-09-09 08:00:00',
+    'to' => '2025-09-09 18:00:00'
+]);
+$slots = $response->json();
+
+// Create booking
+$booking = Http::post('https://yoursite.com/wp-json/td/v1/book', [
+    'service_id' => 1,
+    'start_utc' => '2025-09-09 09:00:00',
+    'customer' => [
+        'name' => 'Customer Name',
+        'email' => 'customer@example.com'
+    ],
+    'terms_accepted' => true
+]);
+
+$result = $booking->json();</pre>
+
+    <h2>Production Considerations</h2>
+    <ul>
+        <li><strong>Authentication:</strong> WordPress nonces for security</li>
+        <li><strong>Rate Limiting:</strong> Built-in rate limiting prevents abuse</li>
+        <li><strong>CORS:</strong> Configure WordPress CORS if calling from different domains</li>
+        <li><strong>SSL:</strong> Always use HTTPS in production</li>
+        <li><strong>Error Handling:</strong> APIs return proper HTTP status codes and error messages</li>
+        <li><strong>Caching:</strong> Availability data is cached for performance</li>
+    </ul>
+
+    <h2>Quick Summary</h2>
+    <p><strong>For WordPress sites:</strong> Just add <code>[td_booking_form]</code> shortcode</p>
+    <p><strong>For any other website:</strong> Call the REST API endpoints directly</p>
+    <p><strong>No complex setup needed!</strong> The booking system is ready to use.</p>
+</body>
+</html>

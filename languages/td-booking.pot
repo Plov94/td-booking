@@ -1,0 +1,409 @@
+msgid "TD Booking"
+msgstr ""
+
+msgid "Services"
+msgstr ""
+
+msgid "Bookings"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Logs"
+msgstr ""
+
+msgid "Edit Service"
+msgstr ""
+
+msgid "Booking Details"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "Phone"
+msgstr ""
+
+msgid "Address"
+msgstr ""
+
+msgid "I accept the terms and conditions"
+msgstr ""
+
+msgid "Book Appointment"
+msgstr ""
+
+msgid "Technicians plugin missing"
+msgstr ""
+
+msgid "Missing required parameters"
+msgstr ""
+
+msgid "TD Booking requires the TD Technicians plugin (active, compatible version). Public endpoints are disabled."
+msgstr ""
+
+# Front-end form and labels
+msgid "Full Name"
+msgstr ""
+
+msgid "Email Address"
+msgstr ""
+
+msgid "Phone Number"
+msgstr ""
+
+msgid "Customer Information"
+msgstr ""
+
+msgid "Select service"
+msgstr ""
+
+msgid "Choose a service"
+msgstr ""
+
+msgid "Number of participants"
+msgstr ""
+
+msgid "Set how many people will attend"
+msgstr ""
+
+msgid "Decrease participants"
+msgstr ""
+
+msgid "Increase participants"
+msgstr ""
+
+msgid "Assigned technician: %s"
+msgstr ""
+
+msgid "Continue to Checkout"
+msgstr ""
+
+msgid "Loading..."
+msgstr ""
+
+msgid "Loading available times..."
+msgstr ""
+
+msgid "No available time slots found. Please try different dates or contact us directly."
+msgstr ""
+
+msgid "Select appointment time"
+msgstr ""
+
+msgid "Choose a time slot"
+msgstr ""
+
+msgid "Error loading available times. Please try again."
+msgstr ""
+
+msgid "Service"
+msgstr ""
+
+msgid "Time slot"
+msgstr ""
+
+msgid "Terms acceptance"
+msgstr ""
+
+msgid "Please fill in the following required fields: "
+msgstr ""
+
+msgid "Please enter a valid email address."
+msgstr ""
+
+msgid "Redirecting to checkout..."
+msgstr ""
+
+msgid "Booking successful! You will receive a confirmation email shortly."
+msgstr ""
+
+msgid "Error creating booking. Please try again."
+msgstr ""
+
+msgid "Network error. Please check your connection and try again."
+msgstr ""
+
+msgid "Select a date to see available times"
+msgstr ""
+
+msgid "Previous month"
+msgstr ""
+
+msgid "Next month"
+msgstr ""
+
+msgid "Calendar"
+msgstr ""
+
+msgid "Select date"
+msgstr ""
+
+msgid "Participant"
+msgstr ""
+
+msgid "Terms & Conditions"
+msgstr ""
+
+msgid "Loading…"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+# Admin notices and menus
+msgid "PHP 8.1 Compatibility Notice:"
+msgstr ""
+
+msgid "You are using PHP 8.1+ with WordPress %s."
+msgstr ""
+
+msgid "For optimal compatibility, consider updating WordPress to version 6.0 or higher."
+msgstr ""
+
+msgid "This plugin includes compatibility fixes for the current setup."
+msgstr ""
+
+# Services list / actions
+msgid "Service deleted successfully."
+msgstr ""
+
+msgid "Also deleted %d associated booking(s)."
+msgstr ""
+
+msgid "Error deleting service."
+msgstr ""
+
+# Booking view / admin actions
+msgid "Invalid booking ID."
+msgstr ""
+
+msgid "Booking not found."
+msgstr ""
+
+msgid "Unknown Service"
+msgstr ""
+
+msgid "Back to Bookings List"
+msgstr ""
+
+msgid "WooCommerce Order"
+msgstr ""
+
+msgid "View Order #%d"
+msgstr ""
+
+msgid "Admin Actions"
+msgstr ""
+
+msgid "Cancel this booking. This will attempt to remove the CalDAV event and email a cancellation ICS to the customer."
+msgstr ""
+
+msgid "Reason (optional)"
+msgstr ""
+
+msgid "Optional note for audit log"
+msgstr ""
+
+msgid "Cancel Booking"
+msgstr ""
+
+msgid "Are you sure you want to cancel this booking?"
+msgstr ""
+
+msgid "Cancelling..."
+msgstr ""
+
+msgid "Cancelled"
+msgstr ""
+
+msgid "Unknown error"
+msgstr ""
+
+msgid "Failed: "
+msgstr ""
+
+# Logs page
+msgid "Logs"
+msgstr ""
+
+msgid "Logs cleared."
+msgstr ""
+
+msgid "You do not have permission to clear logs."
+msgstr ""
+
+msgid "You do not have permission to export logs."
+msgstr ""
+
+msgid "Time (Local)"
+msgstr ""
+
+msgid "Level"
+msgstr ""
+
+msgid "Source"
+msgstr ""
+
+msgid "Booking ID"
+msgstr ""
+
+msgid "Staff ID"
+msgstr ""
+
+msgid "Staff Name"
+msgstr ""
+
+msgid "Message"
+msgstr ""
+
+msgid "Context"
+msgstr ""
+
+msgid "All Levels"
+msgstr ""
+
+msgid "All Sources"
+msgstr ""
+
+msgid "From"
+msgstr ""
+
+msgid "To"
+msgstr ""
+
+msgid "Booking"
+msgstr ""
+
+msgid "Staff"
+msgstr ""
+
+msgid "Search message/context"
+msgstr ""
+
+msgid "%d per page"
+msgstr ""
+
+msgid "Filter"
+msgstr ""
+
+msgid "Export CSV"
+msgstr ""
+
+msgid "Clear Logs"
+msgstr ""
+
+msgid "Are you sure you want to clear all logs?"
+msgstr ""
+
+# Bookings list
+msgid "Bookings"
+msgstr ""
+
+msgid "Redirecting…"
+msgstr ""
+
+msgid "Booking deleted."
+msgstr ""
+
+msgid "Unable to delete booking."
+msgstr ""
+
+msgid "Business days only"
+msgstr ""
+
+msgid "Timezone"
+msgstr ""
+
+msgid "Site TZ"
+msgstr ""
+
+msgid "UTC"
+msgstr ""
+
+msgid "Staff TZ"
+msgstr ""
+
+msgid "Reset"
+msgstr ""
+
+msgid "Total bookings in range:"
+msgstr ""
+
+msgid "Database Error:"
+msgstr ""
+
+msgid "No bookings for this day."
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "Start (UTC)"
+msgstr ""
+
+msgid "Start (Staff TZ)"
+msgstr ""
+
+msgid "Start (Site TZ)"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Group Size"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "View"
+msgstr ""
+
+msgid "Delete this booking? This will remove it permanently."
+msgstr ""
+
+# Staff breaks
+msgid "Staff-wide Breaks & Holidays"
+msgstr ""
+
+msgid "Break"
+msgstr ""
+
+msgid "Holiday"
+msgstr ""
+
+# Admin REST messages
+msgid "Missing staff or CalDAV"
+msgstr ""
+
+msgid "Connection OK"
+msgstr ""
+
+msgid "CalDAV connection failed"
+msgstr ""
+
+msgid "booking_id is required"
+msgstr ""
+
+msgid "Check error log for detailed availability debug information"
+msgstr ""
+
+msgid "Slot datetime required"
+msgstr ""
+
+msgid "Staff ID is required"
+msgstr ""
+
+msgid "Technicians integration not available"
+msgstr ""
+
+msgid "Keys are 0=Sun..6=Sat; each value is array of {start_time, end_time}"
+msgstr ""
+
+msgid "Technicians schedule API not available"
+msgstr ""

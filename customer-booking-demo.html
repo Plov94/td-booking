@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book a Technician - Customer Demo</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .booking-container { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { margin: 0; font-size: 28px; }
+        .header p { margin: 10px 0 0 0; opacity: 0.9; }
+        
+        .form-container { padding: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            color: #333;
+        }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e1e5e9; 
+            border-radius: 8px; 
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .time-slot {
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+        .time-slot:hover {
+            border-color: #2196F3;
+            background: #f0f8ff;
+        }
+        .time-slot.selected {
+            border-color: #2196F3;
+            background: #2196F3;
+            color: white;
+        }
+        .book-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .book-btn:hover {
+            transform: translateY(-2px);
+        }
+        .book-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .demo-note {
+            background: #fff3cd;
+            padding: 15px;
+            margin: 20px;
+            border-radius: 8px;
+            border: 1px solid #ffeaa7;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-note">
+        🔗 <strong>Live API Test:</strong> This form is now connected to your TD Booking API. Real bookings will be created!
+    </div>
+    
+    <div class="booking-container">
+        <div class="header">
+            <h1>� Book a Technician</h1>
+            <p>Schedule your computer repair appointment</p>
+        </div>
+        
+        <div class="form-container">
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="service">Select Service</label>
+                    <select id="service" required>
+                        <option value="">Choose a service...</option>
+                        <option value="1">Computer Repair - $75 (60 min)</option>
+                        <option value="2">Laptop Setup - $50 (45 min)</option>
+                        <option value="3">Virus Removal - $60 (30 min)</option>
+                        <option value="4">Data Recovery - $120 (90 min)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Available Time Slots</label>
+                    <div class="time-slots" id="timeSlots">
+                        <div class="info" style="grid-column: 1 / -1;">
+                            Please select a service first
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedSlot" name="slot">
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" required placeholder="John Doe">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" required placeholder="john@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" placeholder="+1 (555) 123-4567">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" placeholder="123 Main St, City, State">
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Problem Description</label>
+                    <textarea id="notes" rows="3" placeholder="Describe the issue with your computer..."></textarea>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">I agree to the terms and conditions *</label>
+                </div>
+
+                <button type="submit" class="book-btn" disabled>Book Appointment</button>
+                
+                <div class="message" id="message" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Live API Configuration
+        const API_BASE = 'http://taskhub-wp.local/?rest_route=/td/v1/';
+        let wpNonce = null;
+        
+        // Get WordPress nonce for API authentication
+        async function getWPNonce() {
+            if (wpNonce) return wpNonce;
+            try {
+                const response = await fetch('http://taskhub-wp.local/wp-admin/admin-ajax.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=td_booking_get_nonce'
+                });
+                const data = await response.json();
+                wpNonce = data.nonce || 'fallback-nonce';
+                return wpNonce;
+            } catch (e) {
+                console.log('Using fallback nonce');
+                wpNonce = 'fallback-nonce';
+                return wpNonce;
+            }
+        }
+
+        const serviceSelect = document.getElementById('service');
+        const timeSlotsContainer = document.getElementById('timeSlots');
+        const selectedSlotInput = document.getElementById('selectedSlot');
+        const bookBtn = document.querySelector('.book-btn');
+        const messageDiv = document.getElementById('message');
+        const form = document.getElementById('bookingForm');
+
+        let availableServices = [];
+
+        // Load real services from API
+        async function loadServices() {
+            try {
+                showMessage('Loading services...', 'info');
+                
+                // Use WordPress fallback REST API format
+                const url = 'http://taskhub-wp.local/?rest_route=/td/v1/services';
+                console.log('Fetching services from:', url);
+                
+                const response = await fetch(url);
+                console.log('Services response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.text();
+                    console.log('Raw services data:', data);
+                    
+                    availableServices = JSON.parse(data);
+                    console.log('Parsed services:', availableServices);
+                    
+                    populateServiceDropdown();
+                    hideMessage();
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Error loading services:', error);
+                showMessage('Could not load services. Using demo data.', 'error');
+                // Fall back to demo services
+                useDemoServices();
+            }
+        }
+
+        function populateServiceDropdown() {
+            serviceSelect.innerHTML = '<option value="">Choose a service...</option>';
+            availableServices.forEach(service => {
+                const option = document.createElement('option');
+                option.value = service.id;
+                option.textContent = `${service.name} - $${service.price} (${service.duration_min} min)`;
+                serviceSelect.appendChild(option);
+            });
+        }
+
+        function useDemoServices() {
+            // Fallback demo services if API fails
+            availableServices = [
+                { id: 1, name: 'Computer Repair', price: 75, duration_min: 60 },
+                { id: 2, name: 'Laptop Setup', price: 50, duration_min: 45 },
+                { id: 3, name: 'Virus Removal', price: 60, duration_min: 30 },
+                { id: 4, name: 'Data Recovery', price: 120, duration_min: 90 }
+            ];
+            populateServiceDropdown();
+        }
+
+        // Load real availability from API
+        async function loadAvailability(serviceId) {
+            try {
+                showMessage('Loading available times...', 'info');
+                
+                // Get tomorrow's date for availability check
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const fromDate = tomorrow.toISOString().slice(0, 10) + ' 08:00:00';
+                const toDate = tomorrow.toISOString().slice(0, 10) + ' 18:00:00';
+
+                // Find the selected service to get its duration
+                const selectedService = availableServices.find(s => s.id == serviceId);
+                const duration = selectedService ? selectedService.duration_min : 30;
+
+                const params = new URLSearchParams({
+                    'rest_route': '/td/v1/availability',
+                    'service_id': serviceId,
+                    'from': fromDate,
+                    'to': toDate,
+                    'duration': duration
+                });
+                
+                const url = `http://taskhub-wp.local/?${params.toString()}`;
+                console.log('Fetching availability from:', url);
+                
+                const response = await fetch(url);
+                console.log('Availability response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.text();
+                    console.log('Raw availability data:', data);
+                    
+                    const slots = JSON.parse(data);
+                    console.log('Parsed slots:', slots);
+                    
+                    displayTimeSlots(slots);
+                    hideMessage();
+                } else {
+                    throw new Error(`API returned ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Error loading availability:', error);
+                showMessage('Could not load availability. Please try again.', 'error');
+                timeSlotsContainer.innerHTML = '<div class="error" style="grid-column: 1 / -1;">Error loading available times. Please try again.</div>';
+            }
+        }
+
+        function displayTimeSlots(slots) {
+            timeSlotsContainer.innerHTML = '';
+            selectedSlotInput.value = '';
+            updateBookButton();
+
+            if (!slots || slots.length === 0) {
+                timeSlotsContainer.innerHTML = '<div class="info" style="grid-column: 1 / -1;">No available slots for this service today. Try selecting a different service.</div>';
+                return;
+            }
+
+            slots.forEach(slot => {
+                const slotDiv = document.createElement('div');
+                slotDiv.className = 'time-slot';
+                
+                // Format the time display
+                const startTime = new Date(slot.start_utc + 'Z');
+                const endTime = new Date(slot.end_utc + 'Z');
+                const timeStr = startTime.toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit', 
+                    hour12: true 
+                });
+                
+                slotDiv.innerHTML = `<strong>${timeStr}</strong><br><small>Available</small>`;
+                slotDiv.addEventListener('click', () => selectTimeSlot(slotDiv, slot.start_utc));
+                timeSlotsContainer.appendChild(slotDiv);
+            });
+        }
+
+        // Update available time slots when service changes
+        serviceSelect.addEventListener('change', function() {
+            const serviceId = this.value;
+            timeSlotsContainer.innerHTML = '';
+            selectedSlotInput.value = '';
+            updateBookButton();
+
+            if (!serviceId) {
+                timeSlotsContainer.innerHTML = '<div class="info" style="grid-column: 1 / -1;">Please select a service first</div>';
+                return;
+            }
+
+            loadAvailability(serviceId);
+        });
+
+        function selectTimeSlot(element, value) {
+            // Remove selection from other slots
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+            
+            // Select this slot
+            element.classList.add('selected');
+            selectedSlotInput.value = value;
+            updateBookButton();
+        }
+
+        function updateBookButton() {
+            const service = serviceSelect.value;
+            const slot = selectedSlotInput.value;
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const terms = document.getElementById('terms').checked;
+
+            bookBtn.disabled = !(service && slot && name && email && terms);
+        }
+
+        // Update button state when form fields change
+        ['name', 'email', 'terms'].forEach(id => {
+            document.getElementById(id).addEventListener('change', updateBookButton);
+            document.getElementById(id).addEventListener('input', updateBookButton);
+        });
+
+        // Handle real booking submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const nonce = await getWPNonce();
+                
+                const bookingData = {
+                    service_id: parseInt(serviceSelect.value),
+                    start_utc: selectedSlotInput.value,
+                    customer: {
+                        name: document.getElementById('name').value,
+                        email: document.getElementById('email').value,
+                        phone: document.getElementById('phone').value || '',
+                        address: document.getElementById('address').value || ''
+                    },
+                    notes: document.getElementById('notes').value || '',
+                    terms_accepted: true,
+                    wc: false // Direct booking, no WooCommerce
+                };
+
+                console.log('Submitting booking:', bookingData);
+                
+                showMessage('Creating your booking...', 'info');
+                bookBtn.disabled = true;
+                bookBtn.textContent = 'Processing...';
+
+                const response = await fetch('http://taskhub-wp.local/?rest_route=/td/v1/book', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': nonce
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok && result.booking_id) {
+                    showMessage(`✅ Booking confirmed! Your booking ID is #${result.booking_id}. You will receive a confirmation email shortly.`, 'success');
+                    
+                    // Reset form after successful booking
+                    setTimeout(() => {
+                        form.reset();
+                        timeSlotsContainer.innerHTML = '<div class="info" style="grid-column: 1 / -1;">Please select a service first</div>';
+                        selectedSlotInput.value = '';
+                        bookBtn.textContent = 'Book Appointment';
+                        updateBookButton();
+                        hideMessage();
+                    }, 5000);
+                } else {
+                    throw new Error(result.message || 'Booking failed');
+                }
+            } catch (error) {
+                console.error('Booking error:', error);
+                showMessage(`❌ Booking failed: ${error.message}`, 'error');
+            } finally {
+                bookBtn.disabled = false;
+                bookBtn.textContent = 'Book Appointment';
+                updateBookButton();
+            }
+        });
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+        }
+
+        function hideMessage() {
+            messageDiv.style.display = 'none';
+        }
+
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing...');
+            
+            // Add a simple test first
+            testAPIConnection();
+            loadServices();
+        });
+        
+        // Test API connection
+        async function testAPIConnection() {
+            try {
+                console.log('Testing API connection...');
+                const response = await fetch('http://taskhub-wp.local/?rest_route=/td/v1/services');
+                console.log('Test response status:', response.status);
+                console.log('Test response headers:', response.headers);
+                const text = await response.text();
+                console.log('Test response body:', text);
+            } catch (error) {
+                console.error('API test failed:', error);
+                showMessage('CORS or network error. Loading demo data instead.', 'error');
+                useDemoServices();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,421 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: td-booking\n"
+"POT-Creation-Date: 2025-10-02 00:00+0000\n"
+"PO-Revision-Date: 2025-10-02 00:00+0000\n"
+"Language: nb_NO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: GitHub Copilot\n"
+
+#: plugin
+msgid "TD Booking"
+msgstr "TD Bestilling"
+
+msgid "Services"
+msgstr "Tjenester"
+
+msgid "Bookings"
+msgstr "Bestillinger"
+
+msgid "Settings"
+msgstr "Innstillinger"
+
+msgid "Logs"
+msgstr "Logger"
+
+msgid "Edit Service"
+msgstr "Rediger tjeneste"
+
+msgid "Booking Details"
+msgstr "Bestillingsdetaljer"
+
+msgid "Name"
+msgstr "Navn"
+
+msgid "Email"
+msgstr "E-post"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "I accept the terms and conditions"
+msgstr "Jeg aksepterer vilkårene"
+
+msgid "Book Appointment"
+msgstr "Bestill time"
+
+msgid "Technicians plugin missing"
+msgstr "Tekniker-utvidelse mangler"
+
+msgid "Missing required parameters"
+msgstr "Mangler påkrevde parametere"
+
+msgid "TD Booking requires the TD Technicians plugin (active, compatible version). Public endpoints are disabled."
+msgstr "TD Bestilling krever TD Technicians-utvidelsen (aktiv, kompatibel versjon). Offentlige endepunkter er deaktivert."
+
+# Front-end
+msgid "Full Name"
+msgstr "Fullt navn"
+
+msgid "Email Address"
+msgstr "E-postadresse"
+
+msgid "Phone Number"
+msgstr "Telefonnummer"
+
+msgid "Customer Information"
+msgstr "Kundeinformasjon"
+
+msgid "Select service"
+msgstr "Velg tjeneste"
+
+msgid "Choose a service"
+msgstr "Velg en tjeneste"
+
+msgid "Number of participants"
+msgstr "Antall deltakere"
+
+msgid "Set how many people will attend"
+msgstr "Angi hvor mange som deltar"
+
+msgid "Decrease participants"
+msgstr "Reduser deltakere"
+
+msgid "Increase participants"
+msgstr "Øk deltakere"
+
+msgid "Assigned technician: %s"
+msgstr "Tildelt tekniker: %s"
+
+msgid "Continue to Checkout"
+msgstr "Gå til betaling"
+
+msgid "Loading..."
+msgstr "Laster..."
+
+msgid "Loading available times..."
+msgstr "Laster ledige tider..."
+
+msgid "No available time slots found. Please try different dates or contact us directly."
+msgstr "Ingen ledige tidspunkt funnet. Prøv andre datoer eller kontakt oss."
+
+msgid "Select appointment time"
+msgstr "Velg tidspunkt for avtale"
+
+msgid "Choose a time slot"
+msgstr "Velg et tidspunkt"
+
+msgid "Error loading available times. Please try again."
+msgstr "Feil ved lasting av ledige tider. Prøv igjen."
+
+msgid "Service"
+msgstr "Tjeneste"
+
+msgid "Time slot"
+msgstr "Tidspunkt"
+
+msgid "Terms acceptance"
+msgstr "Godkjenning av vilkår"
+
+msgid "Please fill in the following required fields: "
+msgstr "Vennligst fyll ut følgende påkrevde felt: "
+
+msgid "Please enter a valid email address."
+msgstr "Vennligst skriv inn en gyldig e-postadresse."
+
+msgid "Redirecting to checkout..."
+msgstr "Videresender til betaling..."
+
+msgid "Booking successful! You will receive a confirmation email shortly."
+msgstr "Bestilling vellykket! Du vil snart motta en bekreftelses-e-post."
+
+msgid "Error creating booking. Please try again."
+msgstr "Feil ved opprettelse av bestilling. Prøv igjen."
+
+msgid "Network error. Please check your connection and try again."
+msgstr "Nettverksfeil. Sjekk tilkoblingen og prøv igjen."
+
+msgid "Select a date to see available times"
+msgstr "Velg en dato for å se ledige tider"
+
+msgid "Previous month"
+msgstr "Forrige måned"
+
+msgid "Next month"
+msgstr "Neste måned"
+
+msgid "Calendar"
+msgstr "Kalender"
+
+msgid "Select date"
+msgstr "Velg dato"
+
+msgid "Participant"
+msgstr "Deltaker"
+
+msgid "Terms & Conditions"
+msgstr "Vilkår og betingelser"
+
+msgid "Loading…"
+msgstr "Laster…"
+
+msgid "Close"
+msgstr "Lukk"
+
+msgid "View Order #%d"
+msgstr "Vis bestilling #%d"
+
+# Admin notices and menus
+msgid "PHP 8.1 Compatibility Notice:"
+msgstr "PHP 8.1-kompatibilitetsmerknad:"
+
+msgid "You are using PHP 8.1+ with WordPress %s."
+msgstr "Du bruker PHP 8.1+ med WordPress %s."
+
+msgid "For optimal compatibility, consider updating WordPress to version 6.0 or higher."
+msgstr "For best kompatibilitet, vurder oppdatering av WordPress til versjon 6.0 eller nyere."
+
+msgid "This plugin includes compatibility fixes for the current setup."
+msgstr "Denne utvidelsen inkluderer kompatibilitetsfikser for dagens oppsett."
+
+# Services list / actions
+msgid "Service deleted successfully."
+msgstr "Tjenesten ble slettet."
+
+msgid "Also deleted %d associated booking(s)."
+msgstr "Slettet også %d tilknyttet(e) bestilling(er)."
+
+msgid "Error deleting service."
+msgstr "Feil ved sletting av tjeneste."
+
+# Booking view / admin actions
+msgid "Invalid booking ID."
+msgstr "Ugyldig bestillings-ID."
+
+msgid "Booking not found."
+msgstr "Bestilling ble ikke funnet."
+
+msgid "Unknown Service"
+msgstr "Ukjent tjeneste"
+
+msgid "Back to Bookings List"
+msgstr "Tilbake til bestillingsliste"
+
+msgid "WooCommerce Order"
+msgstr "WooCommerce-ordre"
+
+msgid "Admin Actions"
+msgstr "Admin-handlinger"
+
+msgid "Cancel this booking. This will attempt to remove the CalDAV event and email a cancellation ICS to the customer."
+msgstr "Avbryt denne bestillingen. Dette vil forsøke å fjerne CalDAV-hendelsen og sende en avlysnings-ICS til kunden."
+
+msgid "Reason (optional)"
+msgstr "Begrunnelse (valgfritt)"
+
+msgid "Optional note for audit log"
+msgstr "Valgfri merknad for revisjonslogg"
+
+msgid "Cancel Booking"
+msgstr "Avbryt bestilling"
+
+msgid "Are you sure you want to cancel this booking?"
+msgstr "Er du sikker på at du vil avbryte denne bestillingen?"
+
+msgid "Cancelling..."
+msgstr "Avbryter..."
+
+msgid "Cancelled"
+msgstr "Avbrutt"
+
+msgid "Unknown error"
+msgstr "Ukjent feil"
+
+msgid "Failed: "
+msgstr "Feilet: "
+
+# Logs page
+msgid "Logs"
+msgstr "Logger"
+
+msgid "Logs cleared."
+msgstr "Logger slettet."
+
+msgid "You do not have permission to clear logs."
+msgstr "Du har ikke tillatelse til å slette logger."
+
+msgid "You do not have permission to export logs."
+msgstr "Du har ikke tillatelse til å eksportere logger."
+
+msgid "Time (Local)"
+msgstr "Tid (lokal)"
+
+msgid "Level"
+msgstr "Nivå"
+
+msgid "Source"
+msgstr "Kilde"
+
+msgid "Booking ID"
+msgstr "Bestillings-ID"
+
+msgid "Staff ID"
+msgstr "Ansatt-ID"
+
+msgid "Staff Name"
+msgstr "Ansattnavn"
+
+msgid "Message"
+msgstr "Melding"
+
+msgid "Context"
+msgstr "Kontekst"
+
+msgid "All Levels"
+msgstr "Alle nivåer"
+
+msgid "All Sources"
+msgstr "Alle kilder"
+
+msgid "From"
+msgstr "Fra"
+
+msgid "To"
+msgstr "Til"
+
+msgid "Booking"
+msgstr "Bestilling"
+
+msgid "Staff"
+msgstr "Ansatt"
+
+msgid "Search message/context"
+msgstr "Søk i melding/kontekst"
+
+msgid "%d per page"
+msgstr "%d per side"
+
+msgid "Filter"
+msgstr "Filtrer"
+
+msgid "Export CSV"
+msgstr "Eksporter CSV"
+
+msgid "Clear Logs"
+msgstr "Tøm logger"
+
+msgid "Are you sure you want to clear all logs?"
+msgstr "Er du sikker på at du vil tømme alle logger?"
+
+# Bookings list
+msgid "Bookings"
+msgstr "Bestillinger"
+
+msgid "Redirecting…"
+msgstr "Videresender…"
+
+msgid "Booking deleted."
+msgstr "Bestilling slettet."
+
+msgid "Unable to delete booking."
+msgstr "Kan ikke slette bestilling."
+
+msgid "Business days only"
+msgstr "Kun virkedager"
+
+msgid "Timezone"
+msgstr "Tidssone"
+
+msgid "Site TZ"
+msgstr "Nettstedets tidssone"
+
+msgid "UTC"
+msgstr "UTC"
+
+msgid "Staff TZ"
+msgstr "Ansatts tidssone"
+
+msgid "Reset"
+msgstr "Tilbakestill"
+
+msgid "Total bookings in range:"
+msgstr "Totalt antall bestillinger i perioden:"
+
+msgid "Database Error:"
+msgstr "Databasefeil:"
+
+msgid "No bookings for this day."
+msgstr "Ingen bestillinger denne dagen."
+
+msgid "Start"
+msgstr "Start"
+
+msgid "Start (UTC)"
+msgstr "Start (UTC)"
+
+msgid "Start (Staff TZ)"
+msgstr "Start (ansatts tidssone)"
+
+msgid "Start (Site TZ)"
+msgstr "Start (nettstedets tidssone)"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Group Size"
+msgstr "Gruppestørrelse"
+
+msgid "Actions"
+msgstr "Handlinger"
+
+msgid "View"
+msgstr "Vis"
+
+msgid "Delete this booking? This will remove it permanently."
+msgstr "Slette denne bestillingen? Dette vil fjerne den permanent."
+
+# Staff breaks
+msgid "Staff-wide Breaks & Holidays"
+msgstr "Pause og helligdager for alle ansatte"
+
+msgid "Break"
+msgstr "Pause"
+
+msgid "Holiday"
+msgstr "Helligdag"
+
+# Admin REST messages
+msgid "Missing staff or CalDAV"
+msgstr "Mangler ansatt eller CalDAV"
+
+msgid "Connection OK"
+msgstr "Tilkobling OK"
+
+msgid "CalDAV connection failed"
+msgstr "CalDAV-tilkobling feilet"
+
+msgid "booking_id is required"
+msgstr "booking_id er påkrevd"
+
+msgid "Check error log for detailed availability debug information"
+msgstr "Se feilloggen for detaljert feilsøking av tilgjengelighet"
+
+msgid "Slot datetime required"
+msgstr "Tidspunkt for tidspunktspor er påkrevd"
+
+msgid "Staff ID is required"
+msgstr "Ansatt-ID er påkrevd"
+
+msgid "Technicians integration not available"
+msgstr "Tekniker-integrasjon er ikke tilgjengelig"
+
+msgid "Keys are 0=Sun..6=Sat; each value is array of {start_time, end_time}"
+msgstr "Nøkler er 0=søn..6=lør; hver verdi er en liste med {starttid, sluttid}"
+
+msgid "Technicians schedule API not available"
+msgstr "Tekniker-plan API er ikke tilgjengelig"
