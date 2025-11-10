@@ -1,6 +1,6 @@
 === TD Booking ===
 Contributors: Gabriel K. Sagaard
-Tags: booking, appointments, caldav, technicians, scheduling, calendar, woocommerce
+Tags: booking, appointments, caldav, staff, scheduling, calendar, woocommerce
 Requires at least: 6.2
 Tested up to: 6.5
 Requires PHP: 8.0
@@ -40,13 +40,13 @@ TD Booking is a comprehensive appointment scheduling and booking management syst
 **Requirements:**
 * WordPress 6.2 or higher
 * PHP 8.0 or higher
-* TD Technicians plugin (dependency)
+* TD Staff plugin (dependency)
 * MySQL/MariaDB database
 
 **Installation Steps:**
 
-1. **Install TD Technicians Plugin First** (required dependency)
-   - Download and install the TD Technicians plugin
+1. **Install TD Staff Plugin First** (required dependency)
+   - Download and install the TD Staff plugin
    - Activate it before installing TD Booking
 
 2. **Install TD Booking**
@@ -80,7 +80,7 @@ TD Booking is a comprehensive appointment scheduling and booking management syst
    - Test email delivery
 
 3. **Staff Management**
-   - Use TD Technicians plugin to create staff profiles
+   - Use TD Staff plugin to create staff profiles
    - Set individual availability and qualifications
    - Manage staff-wide breaks and holidays
 
@@ -168,9 +168,9 @@ TD Booking provides a comprehensive REST API for integrations:
 
 == Frequently Asked Questions ==
 
-= Do I need the TD Technicians plugin? =
+= Do I need the TD Staff plugin? =
 
-Yes, TD Technicians is a required dependency. TD Booking uses it for staff management and assignment functionality.
+Yes, TD Staff is a required dependency. TD Booking uses it for staff management and assignment functionality.
 
 = Can I integrate with my existing calendar? =
 
@@ -190,7 +190,7 @@ All times are stored in UTC in the database and converted to the appropriate tim
 
 = Can I set staff-specific availability? =
 
-Yes, use the TD Technicians plugin for individual staff availability, and TD Booking's staff breaks feature for organization-wide scheduling.
+Yes, use the TD Staff plugin for individual staff availability, and TD Booking's staff breaks feature for organization-wide scheduling.
 
 = Is the plugin translation-ready? =
 
@@ -216,7 +216,7 @@ TD Booking includes automatic retry mechanisms and detailed logging. Failed sync
 
 * Complete booking management system
 * Service creation and management interface
-* Automatic staff assignment via TD Technicians integration
+* Automatic staff assignment via TD Staff integration
 * CalDAV bidirectional sync (Nextcloud, iCloud, Google Calendar)
 * Staff-wide breaks and holidays management
 * Customizable email notifications with templates
@@ -234,4 +234,4 @@ TD Booking includes automatic retry mechanisms and detailed logging. Failed sync
 == Upgrade Notice ==
 
 = 0.1.0 =
-Initial release of TD Booking. Requires TD Technicians plugin as dependency.
+Initial release of TD Booking.
